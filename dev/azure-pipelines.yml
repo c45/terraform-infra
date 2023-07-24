@@ -19,17 +19,23 @@ steps:
 - checkout: self
   displayName: Checkout Repository   
 - task: TerraformCLI@0
+  displayName: Terraform Init
   inputs:
     command: 'init'
+    workingDirectory: '$(Build.SourcesDirectory)'
     backendType: 'azurerm'
     backendServiceArm: 'PipelineConnection'
     backendAzureRmSubscriptionId: '87ed7345-6e20-4565-844b-70b8b682de46'
 - task: TerraformCLI@0
+  displayName: Terraform Validate
   inputs:
     command: 'validate'
+    workingDirectory: '$(Build.SourcesDirectory)'
 - task: TerraformCLI@0
+  displayName: Terraform Plan
   inputs:
     command: 'plan'
+    workingDirectory: '$(Build.SourcesDirectory)'
     environmentServiceName: 'PipelineConnection'
     providerAzureRmSubscriptionId: '87ed7345-6e20-4565-844b-70b8b682de46'
     publishPlanResults: 'tfplan'
