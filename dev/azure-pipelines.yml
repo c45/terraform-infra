@@ -9,40 +9,29 @@ trigger:
 pool: 
     vmImage: ubuntu-latest
 
-stages:
-    - stage: Test
-      jobs:
-          - job: validate
-            continueOnError: false
-            steps:
-                - task: CopyFiles@2
-                  inputs:
-                    SourceFolder: 'dev'
-                    Contents: '**'
-                    TargetFolder: 
-                - task: TerraformInstaller@0
-                  displayName: Install Terraform
-                  inputs:
-                    terraformVersion: 'v1.5.2'
-                - task: TerraformCLI@0
-                  displayName: Terraform Init
-                  inputs:
-                    command: 'init'
-                    backendType: 'azurerm'
-                    backendServiceArm: 'PipelineConnection'
-                    backendAzureRmSubscriptionId: '87ed7345-6e20-4565-844b-70b8b682de46'
-                    backendAzureRmResourceGroupName: 'terraform-state'
-                    backendAzureRmStorageAccountName: 'bestrongstatedev'
-                    backendAzureRmContainerName: 'tfstate'
-                    backendAzureRmKey: 'dev.terraform.tfstate'
-                - task: TerraformCLI@0
-                  displayName: Terraform Validate
-                  inputs:
-                    command: 'validate'
-                - task: TerraformCLI@0
-                  displayName: Terraform Plan
-                  inputs:
-                    command: 'plan'
-                    environmentServiceName: 'PipelineConnection'
-                    providerAzureRmSubscriptionId: '87ed7345-6e20-4565-844b-70b8b682de46'
-                    publishPlanResults: 'tfplan'
+
+steps:
+- task: TerraformInstaller@0
+  displayName: Install Terraform
+  inputs:
+    terraformVersion: 'v1.5.2'
+
+- checkout: self
+  displayName: Checkout Repository   
+- task: TerraformCLI@0
+  inputs:
+    command: 'init'
+    backendType: 'azurerm'
+    backendServiceArm: 'PipelineConnection'
+    backendAzureRmSubscriptionId: '87ed7345-6e20-4565-844b-70b8b682de46'
+- task: TerraformCLI@0
+  inputs:
+    command: 'validate'
+- task: TerraformCLI@0
+  inputs:
+    command: 'plan'
+    environmentServiceName: 'PipelineConnection'
+    providerAzureRmSubscriptionId: '87ed7345-6e20-4565-844b-70b8b682de46'
+    publishPlanResults: 'tfplan'
+
+    
