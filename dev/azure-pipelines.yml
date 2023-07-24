@@ -4,13 +4,10 @@ trigger:
       - master
   paths:
     include:
-      - dev    
+      - dev
 
 pool: 
     vmImage: ubuntu-latest
-
-variables:
-  workdir: /home/vsts/work/1/s/dev
 
 steps:
 - task: TerraformInstaller@0
@@ -19,7 +16,8 @@ steps:
     terraformVersion: 'v1.5.2'
 
 - checkout: self
-  displayName: Checkout Repository   
+  displayName: Checkout Repository  
+
 - task: TerraformCLI@0
   displayName: Terraform Init
   inputs:
@@ -28,11 +26,13 @@ steps:
     backendType: 'azurerm'
     backendServiceArm: 'PipelineConnection'
     backendAzureRmSubscriptionId: $(subscription_id)
+
 - task: TerraformCLI@0
   displayName: Terraform Validate
   inputs:
     command: 'validate'
     workingDirectory: '$(workdir)'
+
 - task: TerraformCLI@0
   displayName: Terraform Plan
   inputs:
@@ -41,6 +41,7 @@ steps:
     environmentServiceName: 'PipelineConnection'
     providerAzureRmSubscriptionId: $(subscription_id)
     publishPlanResults: 'tfplan'
+
 - task: TerraformCLI@0
   displayName: Terraform Apply
   inputs:
