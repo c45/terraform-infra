@@ -45,8 +45,9 @@ steps:
   displayName: Terraform Apply
   inputs:
     command: 'apply'
+    commandOptions: 'tfplan'    
+    workingDirectory: '$(workdir)'
     environmentServiceName: 'PipelineConnection'
     providerAzureRmSubscriptionId: '$(subscription_id)'
-    allowTelemetryCollection: false
 
     
