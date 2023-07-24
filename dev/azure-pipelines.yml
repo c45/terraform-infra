@@ -10,13 +10,18 @@ pool:
     vmImage: ubuntu-latest
 
 stages:
-    - stage: validate
+    - stage: Test
       jobs:
           - job: validate
             continueOnError: false
             steps:
+                - task: CopyFiles@2
+                  inputs:
+                    SourceFolder: 'dev'
+                    Contents: '**'
+                    TargetFolder: 
                 - task: TerraformInstaller@0
-                  displayName: Install
+                  displayName: Install Terraform
                   inputs:
                     terraformVersion: 'v1.5.2'
                 - task: TerraformCLI@0
@@ -35,6 +40,7 @@ stages:
                   inputs:
                     command: 'validate'
                 - task: TerraformCLI@0
+                  displayName: Terraform Plan
                   inputs:
                     command: 'plan'
                     environmentServiceName: 'PipelineConnection'
