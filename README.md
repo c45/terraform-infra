@@ -1,4 +1,4 @@
-# This Terraform configuration deploys the following infrastructure on Azure cloud:
+# This Terraform configuration deploys following infrastructure on Azure cloud:
 
 - VNET with Delegated subnet for App Service and Endpoint subnet for Private Endpoints
 - App Service Plan
