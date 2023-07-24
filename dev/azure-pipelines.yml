@@ -19,8 +19,10 @@ steps:
 - checkout: self
   displayName: Checkout Repository  
 - script: |
+    ls
     cd dev
     pwd
+    ls
   displayName: Change Directory  
 - task: TerraformCLI@0
   displayName: Terraform Init
