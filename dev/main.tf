@@ -1,14 +1,16 @@
 data "azurerm_client_config" "current" {}
 
 module "network" {
-  source         = "../modules/network"
+  source         = "c45/network/bestrong"
+  version        = "1.0.0"
   resource_group = azurerm_resource_group.this.name
   location       = azurerm_resource_group.this.location
   env_name       = var.env_name
 }
 
 module "app" {
-  source         = "../modules/app"
+  source         = "c45/app/bestrong"
+  version        = "1.0.0"
   resource_group = azurerm_resource_group.this.name
   location       = azurerm_resource_group.this.location
   plan_name      = "${var.env_name}bestrongserviceplan"
@@ -24,7 +26,8 @@ module "app" {
 }
 
 module "database" {
-  source         = "../modules/database"
+  source         = "c45/database/bestrong"
+  version        = "1.0.0"
   resource_group = azurerm_resource_group.this.name
   location       = azurerm_resource_group.this.location
   server_name    = "${var.env_name}bestrongmssqlserver"
