@@ -47,7 +47,6 @@ steps:
     command: 'apply'
     environmentServiceName: 'PipelineConnection'
     providerAzureRmSubscriptionId: '$(subscription_id)'
-    commandOptions: 'tfplan'
     allowTelemetryCollection: false
 
     
