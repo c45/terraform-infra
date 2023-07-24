@@ -1,4 +1,10 @@
-trigger: pr
+trigger: 
+  branches:
+    include:
+      - master
+  paths:
+    include:
+      - dev    
 
 pool: 
     vmImage: ubuntu-latest
