@@ -6,50 +6,61 @@ trigger:
     include:
       - dev/*
     exclude:
-      - README.md  
+      - README.md
 
 pool: 
     vmImage: ubuntu-latest
 
-steps:
-- task: TerraformInstaller@0
-  displayName: Install Terraform
-  inputs:
-    terraformVersion: 'v1.5.2'
+stages:
+  - stage: Test
+    jobs:
+    - job: Install-Terraform
+      steps:
+      - task: TerraformInstaller@0
+        inputs:
+          terraformVersion: '1.5.2'
 
-- checkout: self
-  displayName: Checkout Repository  
+    - job: Checkout-Repository
+      steps:
+      - checkout: self
 
-- task: TerraformCLI@0
-  displayName: Terraform Init
-  inputs:
-    command: 'init'
-    workingDirectory: '$(workdir)'
-    backendType: 'azurerm'
-    backendServiceArm: 'PipelineConnection'
-    backendAzureRmSubscriptionId: $(subscription_id)
+    - job: 
+      steps:    
+      - task: TerraformCLI@0
+        displayName: Terraform-Init
+        inputs:
+          command: 'init'
+          workingDirectory: '$(workdir)'
+          backendType: 'azurerm'
+          backendServiceArm: 'PipelineConnection'
+          backendAzureRmSubscriptionId: $(subscription_id)
 
-- task: TerraformCLI@0
-  displayName: Terraform Validate
-  inputs:
-    command: 'validate'
-    workingDirectory: '$(workdir)'
+    - job: Terraform-Validate
+      steps:    
+      - task: TerraformCLI@0
+        inputs:
+          command: 'validate'
+          workingDirectory: '$(workdir)'
 
-- task: TerraformCLI@0
-  displayName: Terraform Plan
-  inputs:
-    command: 'plan'
-    workingDirectory: '$(workdir)'
-    environmentServiceName: 'PipelineConnection'
-    providerAzureRmSubscriptionId: $(subscription_id)
-    publishPlanResults: 'tfplan'
-
-- task: TerraformCLI@0
-  displayName: Terraform Apply
-  inputs:
-    command: 'apply'
-    workingDirectory: '$(workdir)'
-    environmentServiceName: 'PipelineConnection'
-    providerAzureRmSubscriptionId: '$(subscription_id)'
-
+    - job: Terraform-Plan
+      steps:    
+      - task: TerraformCLI@0
+        inputs:
+          command: 'plan'
+          workingDirectory: '$(workdir)'
+          environmentServiceName: 'PipelineConnection'
+          providerAzureRmSubscriptionId: $(subscription_id)
+          publishPlanResults: 'tfplan'
+      -    
+    - task: GitHubRelease@1
+      inputs:
+        gitHubConnection: 'Github'
+        repositoryName: 'c45/bestrong-infra'
+        action: 'create'
+        target: '$(Build.SourceVersion)'
+        tagSource: 'gitTag'
+        tagPattern: 'v1.*'
+        releaseNotesSource: 'inline'
+        changeLogCompareToRelease: 'lastFullRelease'
+        changeLogType: 'commitBased'
     
