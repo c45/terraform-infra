@@ -12,7 +12,7 @@ pool:
     vmImage: ubuntu-latest
 
 stages:
-  - stage: Test
+  - stage: Install_Terraform
     jobs:
     - job: Install_Terraform
       steps:
@@ -20,10 +20,16 @@ stages:
         inputs:
           terraformVersion: '1.5.2'
 
+  - stage: Checkout_Repository
+    dependsOn: Install_Terraform
+    jobs:
     - job: Checkout_Repository
       steps:
       - checkout: self
 
+  - stage: Terraform_Init
+    dependsOn: Checkout_Repository
+    jobs:
     - job: Terraform_Init
       steps:    
       - task: TerraformCLI@0
@@ -34,6 +40,9 @@ stages:
           backendServiceArm: 'PipelineConnection'
           backendAzureRmSubscriptionId: $(subscription_id)
 
+  - stage: Terraform_Validate
+    dependsOn: Terraform_Init
+    jobs:
     - job: Terraform_Validate
       steps:    
       - task: TerraformCLI@0
@@ -41,6 +50,9 @@ stages:
           command: 'validate'
           workingDirectory: '$(workdir)'
 
+  - stage: Terraform_Plan
+    dependsOn: Terraform_Validate
+    jobs:
     - job: Terraform_Plan
       steps:    
       - task: TerraformCLI@0
@@ -52,7 +64,7 @@ stages:
           publishPlanResults: 'tfplan'
       
   - stage: Create_Release
-    dependsOn: Test
+    dependsOn: Terraform_Plan
     jobs:
     - job: Create_Github_Release
       steps:
