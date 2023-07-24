@@ -27,7 +27,7 @@ steps:
     workingDirectory: '$(workdir)'
     backendType: 'azurerm'
     backendServiceArm: 'PipelineConnection'
-    backendAzureRmSubscriptionId: '87ed7345-6e20-4565-844b-70b8b682de46'
+    backendAzureRmSubscriptionId: $(subscription_id)
 - task: TerraformCLI@0
   displayName: Terraform Validate
   inputs:
@@ -39,7 +39,15 @@ steps:
     command: 'plan'
     workingDirectory: '$(workdir)'
     environmentServiceName: 'PipelineConnection'
-    providerAzureRmSubscriptionId: '87ed7345-6e20-4565-844b-70b8b682de46'
+    providerAzureRmSubscriptionId: $(subscription_id)
     publishPlanResults: 'tfplan'
+- task: TerraformCLI@0
+  displayName: Terraform Apply
+  inputs:
+    command: 'apply'
+    environmentServiceName: 'PipelineConnection'
+    providerAzureRmSubscriptionId: '$(subscription_id)'
+    commandOptions: 'tfplan'
+    allowTelemetryCollection: false
 
     
