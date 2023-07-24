@@ -51,16 +51,20 @@ stages:
           environmentServiceName: 'PipelineConnection'
           providerAzureRmSubscriptionId: $(subscription_id)
           publishPlanResults: 'tfplan'
-      -    
-    - task: GitHubRelease@1
-      inputs:
-        gitHubConnection: 'Github'
-        repositoryName: 'c45/bestrong-infra'
-        action: 'create'
-        target: '$(Build.SourceVersion)'
-        tagSource: 'gitTag'
-        tagPattern: 'v1.*'
-        releaseNotesSource: 'inline'
-        changeLogCompareToRelease: 'lastFullRelease'
-        changeLogType: 'commitBased'
-    
+      
+  - stage: Create Release
+    jobs:
+    - job: Create-Github-Release
+      steps:
+      - task: GitHubRelease@1
+        inputs:
+          gitHubConnection: 'Github'
+          repositoryName: 'c45/bestrong-infra'
+          action: 'create'
+          target: '$(Build.SourceVersion)'
+          tagSource: 'gitTag'
+          tagPattern: 'v1.*'
+          releaseNotesSource: 'inline'
+          changeLogCompareToRelease: 'lastFullRelease'
+          changeLogType: 'commitBased'
+      
