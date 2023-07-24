@@ -14,48 +14,46 @@ pool:
 stages:
   - stage: Test
     jobs:
-      - job: Test_Terraform_Configuration
-        steps:
-        - task: TerraformInstaller@0
-          displayName: Install Terraform
-          inputs:
-            terraformVersion: 'v1.5.2'
+    - job: Install_Terraform
+      steps:
+      - task: TerraformInstaller@0
+        inputs:
+          terraformVersion: '1.5.2'
 
-        - checkout: self
-          displayName: Checkout Repository  
+    - job: Checkout_Repository
+      dependsOn: Install_Terraform
+      steps:
+      - checkout: self
 
-        - task: TerraformCLI@0
-          displayName: Terraform Init
-          inputs:
-            command: 'init'
-            workingDirectory: '$(workdir)'
-            backendType: 'azurerm'
-            backendServiceArm: 'PipelineConnection'
-            backendAzureRmSubscriptionId: $(subscription_id)
+    - job: Terraform_Init
+      dependsOn: Checkout_Repository
+      steps:    
+      - task: TerraformCLI@0
+        inputs:
+          command: 'init'
+          workingDirectory: '$(workdir)'
+          backendType: 'azurerm'
+          backendServiceArm: 'PipelineConnection'
+          backendAzureRmSubscriptionId: $(subscription_id)
 
-        - task: TerraformCLI@0
-          displayName: Terraform Validate
-          inputs:
-            command: 'validate'
-            workingDirectory: '$(workdir)'
+    - job: Terraform_Validate
+      dependsOn: Terraform_Init
+      steps:    
+      - task: TerraformCLI@0
+        inputs:
+          command: 'validate'
+          workingDirectory: '$(workdir)'
 
-        - task: TerraformCLI@0
-          displayName: Terraform Plan
-          inputs:
-            command: 'plan'
-            workingDirectory: '$(workdir)'
-            environmentServiceName: 'PipelineConnection'
-            providerAzureRmSubscriptionId: $(subscription_id)
-            publishPlanResults: 'tfplan'
-
-        - task: TerraformCLI@0
-          displayName: Terraform Apply
-          inputs:
-            command: 'apply'
-            workingDirectory: '$(workdir)'
-            environmentServiceName: 'PipelineConnection'
-            providerAzureRmSubscriptionId: '$(subscription_id)'
-
+    - job: Terraform_Plan
+      dependsOn: Terraform_Validate
+      steps:    
+      - task: TerraformCLI@0
+        inputs:
+          command: 'plan'
+          workingDirectory: '$(workdir)'
+          environmentServiceName: 'PipelineConnection'
+          providerAzureRmSubscriptionId: $(subscription_id)
+          publishPlanResults: 'tfplan'
       
   - stage: Release
     dependsOn: Test
