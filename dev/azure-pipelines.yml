@@ -51,7 +51,7 @@ stages:
           providerAzureRmSubscriptionId: $(subscription_id)
           publishPlanResults: 'tfplan'
       
-  - stage: Create Release
+  - stage: Create_Release
     dependsOn: Test
     jobs:
     - job: Create_Github_Release
