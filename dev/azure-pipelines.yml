@@ -14,20 +14,19 @@ pool:
 stages:
   - stage: Test
     jobs:
-    - job: Install-Terraform
+    - job: Install_Terraform
       steps:
       - task: TerraformInstaller@0
         inputs:
           terraformVersion: '1.5.2'
 
-    - job: Checkout-Repository
+    - job: Checkout_Repository
       steps:
       - checkout: self
 
-    - job: 
+    - job: Terraform_Init
       steps:    
       - task: TerraformCLI@0
-        displayName: Terraform-Init
         inputs:
           command: 'init'
           workingDirectory: '$(workdir)'
@@ -35,14 +34,14 @@ stages:
           backendServiceArm: 'PipelineConnection'
           backendAzureRmSubscriptionId: $(subscription_id)
 
-    - job: Terraform-Validate
+    - job: Terraform_Validate
       steps:    
       - task: TerraformCLI@0
         inputs:
           command: 'validate'
           workingDirectory: '$(workdir)'
 
-    - job: Terraform-Plan
+    - job: Terraform_Plan
       steps:    
       - task: TerraformCLI@0
         inputs:
@@ -53,8 +52,9 @@ stages:
           publishPlanResults: 'tfplan'
       
   - stage: Create Release
+    dependsOn: Test
     jobs:
-    - job: Create-Github-Release
+    - job: Create_Github_Release
       steps:
       - task: GitHubRelease@1
         inputs:
