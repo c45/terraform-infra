@@ -9,6 +9,8 @@ trigger:
 pool: 
     vmImage: ubuntu-latest
 
+variables:
+  workdir: /home/vsts/work/1/s/dev
 
 steps:
 - task: TerraformInstaller@0
@@ -19,16 +21,13 @@ steps:
 - checkout: self
   displayName: Checkout Repository  
 - script: |
-    ls
     cd dev
-    pwd
-    ls
-  displayName: Change Directory  
+  displayName: Switch to Dev  
 - task: TerraformCLI@0
   displayName: Terraform Init
   inputs:
     command: 'init'
-    workingDirectory: '$(Build.SourcesDirectory)'
+    workingDirectory: '$(workdir)'
     backendType: 'azurerm'
     backendServiceArm: 'PipelineConnection'
     backendAzureRmSubscriptionId: '87ed7345-6e20-4565-844b-70b8b682de46'
@@ -36,12 +35,12 @@ steps:
   displayName: Terraform Validate
   inputs:
     command: 'validate'
-    workingDirectory: '$(Build.SourcesDirectory)'
+    workingDirectory: '$(workdir)'
 - task: TerraformCLI@0
   displayName: Terraform Plan
   inputs:
     command: 'plan'
-    workingDirectory: '$(Build.SourcesDirectory)'
+    workingDirectory: '$(workdir)'
     environmentServiceName: 'PipelineConnection'
     providerAzureRmSubscriptionId: '87ed7345-6e20-4565-844b-70b8b682de46'
     publishPlanResults: 'tfplan'
