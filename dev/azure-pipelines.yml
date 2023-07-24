@@ -36,13 +36,6 @@ steps:
     workingDirectory: '$(workdir)'
 
 - task: TerraformCLI@0
-  inputs:
-    command: 'refresh'
-    workingDirectory: '$(workdir)'
-    environmentServiceName: 'PipelineConnection'
-    providerAzureRmSubscriptionId: '$(subscription_id)'
-
-- task: TerraformCLI@0
   displayName: Terraform Plan
   inputs:
     command: 'plan'
