@@ -14,7 +14,7 @@ pool:
 stages:
   - stage: Test
     jobs:
-      - job: Terraform
+      - job: Test_Terraform_Configuration
         steps:
         - task: TerraformInstaller@0
           displayName: Install Terraform
@@ -57,7 +57,7 @@ stages:
             providerAzureRmSubscriptionId: '$(subscription_id)'
 
       
-  - stage: Create_Release
+  - stage: Release
     dependsOn: Test
     jobs:
     - job: Create_Github_Release
