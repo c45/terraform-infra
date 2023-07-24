@@ -19,10 +19,7 @@ steps:
     terraformVersion: 'v1.5.2'
 
 - checkout: self
-  displayName: Checkout Repository  
-- script: |
-    cd dev
-  displayName: Switch to Dev  
+  displayName: Checkout Repository   
 - task: TerraformCLI@0
   displayName: Terraform Init
   inputs:
