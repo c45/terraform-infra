@@ -1,19 +1,67 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
+trigger: 
+  branches:
+    include:
+      - master
+  paths:
+    include:
+      - dev/*  
+pr: none
 
-trigger:
-- master
+pool: 
+    vmImage: ubuntu-latest
 
-pool:
-  vmImage: ubuntu-latest
+stages:
+  - stage: Dev
+    jobs:
+      - job: CI
+        steps:
+        - task: TerraformInstaller@0
+          displayName: Install Terraform
+          inputs:
+            terraformVersion: 'v1.5.2'
 
-steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
+        - checkout: self
+          displayName: Checkout Repository  
 
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+        - task: TerraformCLI@0
+          displayName: Terraform Init
+          inputs:
+            command: 'init'
+            workingDirectory: '$(TF_ROOT)'
+            backendType: 'azurerm'
+            backendServiceArm: 'PipelineConnection'
+            backendAzureRmSubscriptionId: $(SUBSCRIPTION_ID)
+
+        - task: TerraformCLI@0
+          displayName: Terraform Validate
+          inputs:
+            command: 'validate'
+            workingDirectory: '$(TF_ROOT)'
+
+        - task: TerraformCLI@0
+          displayName: Terraform Plan
+          inputs:
+            command: 'plan'
+            workingDirectory: '$(TF_ROOT)'
+            environmentServiceName: 'PipelineConnection'
+            providerAzureRmSubscriptionId: $(SUBSCRIPTION_ID)
+            publishPlanResults: 'tfplan'
+      - job: ManualApproval
+        condition: succeeded('CI')
+        steps:
+ #       - task: TerraformCLI@0
+ #         inputs:
+ #           command: 'apply'
+ #           workingDirectory: '$(TF_ROOT)'
+ #           environmentServiceName: 'PipelineConnection'
+ #           providerAzureRmSubscriptionId: '$(SUBSCRIPTION_ID)'
+        - task: TerraformCLI@0
+          inputs:
+            command: 'destroy'
+            workingDirectory: '$(TF_ROOT)'
+            environmentServiceName: 'PipelineConnection'
+            providerAzureRmSubscriptionId: '$(SUBSCRIPTION_ID)'
+
+
+
+    
