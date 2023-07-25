@@ -1,14 +1,5 @@
 trigger: none
 pr: none
-resources:
-  pipelines:
-    - pipeline: Dev
-      project: 'BeStrong'
-      source: 'dev-ci'
-      trigger:
-        branches:
-          include:
-            - master
 
 
 pool: 
