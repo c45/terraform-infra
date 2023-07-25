@@ -82,6 +82,7 @@ stages:
             onTimeout: 'resume'
 
       - job: Destroy
+        dependsOn: Approve
         pool:
           vmImage: ubuntu-latest
         steps:
