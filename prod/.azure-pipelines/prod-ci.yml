@@ -56,7 +56,7 @@ stages:
         
           inputs:
             notifyUsers: 'Apply Infrastructure'
-  - stage: Apply
+  - stage: CD
     pool: 
       vmImage: ubuntu-latest
     jobs:
@@ -69,6 +69,15 @@ stages:
             workingDirectory: '$(TF_ROOT)'
             environmentServiceName: 'PipelineConnection'
             providerAzureRmSubscriptionId: '$(SUBSCRIPTION_ID)'
+
+        - task: TerraformCLI@0
+          displayName: Terraform Init
+          inputs:
+            command: 'init'
+            workingDirectory: '$(TF_ROOT)'
+            backendType: 'azurerm'
+            backendServiceArm: 'PipelineConnection'
+            backendAzureRmSubscriptionId: $(SUBSCRIPTION_ID) 
             
         - task: TerraformCLI@0
           inputs:
