@@ -58,6 +58,7 @@ stages:
             displayName: Manual Validation
             inputs:
               notifyUsers: 'Apply changes to the Production environment?'
+              
       - job: Deploy
         pool: 
           vmImage: ubuntu-latest
@@ -86,9 +87,10 @@ stages:
       - job: Approve
         pool: server
         steps:
-        - task: ManualIntervention@8
+        - task: ManualValidation@0
           inputs:
-            instructions: 'Delete all cloud resources?'
+            notifyUsers: 'Delete all cloud resources?'
+            onTimeout: 'resume'
 
       - job: Destroy
         pool:
