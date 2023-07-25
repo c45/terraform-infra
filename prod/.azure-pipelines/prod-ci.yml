@@ -2,7 +2,7 @@ trigger: none
 pr: none
 resources:
   pipelines:
-    - pipeline: dev-ci
+    - pipeline: Dev
       source: dev-ci
       trigger:
         branches:
