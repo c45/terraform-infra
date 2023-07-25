@@ -28,32 +28,32 @@ stages:
           displayName: Terraform Init
           inputs:
             command: 'init'
-            workingDirectory: '$(workdir)'
+            workingDirectory: '$(TF_ROOT)'
             backendType: 'azurerm'
             backendServiceArm: 'PipelineConnection'
-            backendAzureRmSubscriptionId: $(subscription_id)
+            backendAzureRmSubscriptionId: $(SUBSCRIPTION_ID)
 
         - task: TerraformCLI@0
           displayName: Terraform Validate
           inputs:
             command: 'validate'
-            workingDirectory: '$(workdir)'
+            workingDirectory: '$(TF_ROOT)'
 
         - task: TerraformCLI@0
           displayName: Terraform Plan
           inputs:
             command: 'plan'
-            workingDirectory: '$(workdir)'
+            workingDirectory: '$(TF_ROOT)'
             environmentServiceName: 'PipelineConnection'
-            providerAzureRmSubscriptionId: $(subscription_id)
+            providerAzureRmSubscriptionId: $(SUBSCRIPTION_ID)
             publishPlanResults: 'tfplan'
 
         - task: TerraformCLI@0
           displayName: Terraform Apply
           inputs:
             command: 'apply'
-            workingDirectory: '$(workdir)'
+            workingDirectory: '$(TF_ROOT)'
             environmentServiceName: 'PipelineConnection'
-            providerAzureRmSubscriptionId: '$(subscription_id)'
+            providerAzureRmSubscriptionId: '$(SUBSCRIPTION_ID)'
 
     
