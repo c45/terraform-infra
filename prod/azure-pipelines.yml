@@ -1,20 +1,47 @@
-trigger: 
-  branches:
-    include:
-      - master
-  paths:
-    include:
-      - prod/*
-    exclude:
-      - README.md
-pool:
-  vmImage: ubuntu-latest
+trigger: none
+
+pool: 
+    vmImage: ubuntu-latest
 
 steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
+- task: TerraformInstaller@0
+  displayName: Install Terraform
+  inputs:
+    terraformVersion: 'v1.5.2'
 
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+- checkout: self
+  displayName: Checkout Repository  
+
+- task: TerraformCLI@0
+  displayName: Terraform Init
+  inputs:
+    command: 'init'
+    workingDirectory: '$(TF_ROOT)'
+    backendType: 'azurerm'
+    backendServiceArm: 'PipelineConnection'
+    backendAzureRmSubscriptionId: $(subscription_id)
+
+- task: TerraformCLI@0
+  displayName: Terraform Validate
+  inputs:
+    command: 'validate'
+    workingDirectory: '$(TF_ROOT)'
+
+- task: TerraformCLI@0
+  displayName: Terraform Plan
+  inputs:
+    command: 'plan'
+    workingDirectory: '$(TF_ROOT)'
+    environmentServiceName: 'PipelineConnection'
+    providerAzureRmSubscriptionId: $(subscription_id)
+    publishPlanResults: 'tfplan'
+
+- task: TerraformCLI@0
+  displayName: Terraform Apply
+  inputs:
+    command: 'apply'
+    workingDirectory: '$(TF_ROOT)'
+    environmentServiceName: 'PipelineConnection'
+    providerAzureRmSubscriptionId: '$(subscription_id)'
+
+    
