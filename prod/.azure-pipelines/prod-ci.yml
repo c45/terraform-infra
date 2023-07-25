@@ -51,7 +51,7 @@ stages:
 
   - stage: CD
     jobs:
-      - job: Validation
+      - job: Approve
         pool: server
         steps:
           - task: ManualValidation@0
@@ -61,7 +61,7 @@ stages:
       - job: Deploy
         pool: 
           vmImage: ubuntu-latest
-        displayName: Deploying to Production
+        displayName: Deploy to Production
         steps:
         - task: TerraformCLI@0
           displayName: Terraform Init
