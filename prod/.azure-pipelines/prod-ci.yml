@@ -1,5 +1,14 @@
 trigger: none
 pr: none
+resources:
+  pipelines:
+    - pipeline: dev-ci
+      source: ../../dev/.azure-pipelines/dev-ci.yml
+      trigger:
+        branches:
+          include:
+            - master
+
 
 pool: 
     vmImage: ubuntu-latest
