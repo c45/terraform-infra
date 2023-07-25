@@ -4,9 +4,8 @@ trigger:
       - master
   paths:
     include:
-      - dev/*
-    exclude:
-      - README.md  
+      - dev/*  
+pr: none
 
 pool: 
     vmImage: ubuntu-latest
