@@ -63,14 +63,6 @@ stages:
       - job: Apply
         steps:
         - task: TerraformCLI@0
-          displayName: Terraform Apply
-          inputs:
-            command: 'apply'
-            workingDirectory: '$(TF_ROOT)'
-            environmentServiceName: 'PipelineConnection'
-            providerAzureRmSubscriptionId: '$(SUBSCRIPTION_ID)'
-
-        - task: TerraformCLI@0
           displayName: Terraform Init
           inputs:
             command: 'init'
@@ -78,6 +70,14 @@ stages:
             backendType: 'azurerm'
             backendServiceArm: 'PipelineConnection'
             backendAzureRmSubscriptionId: $(SUBSCRIPTION_ID) 
+            
+        - task: TerraformCLI@0
+          displayName: Terraform Apply
+          inputs:
+            command: 'apply'
+            workingDirectory: '$(TF_ROOT)'
+            environmentServiceName: 'PipelineConnection'
+            providerAzureRmSubscriptionId: '$(SUBSCRIPTION_ID)'
             
         - task: TerraformCLI@0
           inputs:
