@@ -3,7 +3,7 @@ pr: none
 resources:
   pipelines:
     - pipeline: dev-ci
-      source: ../../dev/.azure-pipelines/dev-ci.yml
+      source: dev-ci
       trigger:
         branches:
           include:
