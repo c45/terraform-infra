@@ -14,7 +14,7 @@ module "app" {
   resource_group = azurerm_resource_group.this.name
   location       = azurerm_resource_group.this.location
   plan_name      = "${var.env_name}bestrongserviceplan"
-  plan_sku       = "F1"
+  plan_sku       = "S1"
   app_name       = "${var.env_name}bestrongapp"
   subnet_id      = module.network.integration_subnet_id
 
