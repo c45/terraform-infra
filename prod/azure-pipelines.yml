@@ -23,7 +23,7 @@ stages:
             workingDirectory: '$(TF_ROOT)'
             backendType: 'azurerm'
             backendServiceArm: 'PipelineConnection'
-            backendAzureRmSubscriptionId: $(subscription_id)
+            backendAzureRmSubscriptionId: $(SUBSCRIPTION_ID)
 
         - task: TerraformCLI@0
           displayName: Terraform Validate
@@ -37,7 +37,7 @@ stages:
             command: 'plan'
             workingDirectory: '$(TF_ROOT)'
             environmentServiceName: 'PipelineConnection'
-            providerAzureRmSubscriptionId: $(subscription_id)
+            providerAzureRmSubscriptionId: $(SUBSCRIPTION_ID)
             publishPlanResults: 'tfplan'
 
         - task: TerraformCLI@0
@@ -46,6 +46,6 @@ stages:
             command: 'apply'
             workingDirectory: '$(TF_ROOT)'
             environmentServiceName: 'PipelineConnection'
-            providerAzureRmSubscriptionId: '$(subscription_id)'
+            providerAzureRmSubscriptionId: '$(SUBSCRIPTION_ID)'
 
     
