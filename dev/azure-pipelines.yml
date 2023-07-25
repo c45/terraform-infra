@@ -11,45 +11,49 @@ trigger:
 pool: 
     vmImage: ubuntu-latest
 
-steps:
-- task: TerraformInstaller@0
-  displayName: Install Terraform
-  inputs:
-    terraformVersion: 'v1.5.2'
+stages:
+  - stage: Dev
+    jobs:
+      - job: CI
+        steps:
+        - task: TerraformInstaller@0
+          displayName: Install Terraform
+          inputs:
+            terraformVersion: 'v1.5.2'
 
-- checkout: self
-  displayName: Checkout Repository  
+        - checkout: self
+          displayName: Checkout Repository  
 
-- task: TerraformCLI@0
-  displayName: Terraform Init
-  inputs:
-    command: 'init'
-    workingDirectory: '$(workdir)'
-    backendType: 'azurerm'
-    backendServiceArm: 'PipelineConnection'
-    backendAzureRmSubscriptionId: $(subscription_id)
+        - task: TerraformCLI@0
+          displayName: Terraform Init
+          inputs:
+            command: 'init'
+            workingDirectory: '$(workdir)'
+            backendType: 'azurerm'
+            backendServiceArm: 'PipelineConnection'
+            backendAzureRmSubscriptionId: $(subscription_id)
 
-- task: TerraformCLI@0
-  displayName: Terraform Validate
-  inputs:
-    command: 'validate'
-    workingDirectory: '$(workdir)'
+        - task: TerraformCLI@0
+          displayName: Terraform Validate
+          inputs:
+            command: 'validate'
+            workingDirectory: '$(workdir)'
 
-- task: TerraformCLI@0
-  displayName: Terraform Plan
-  inputs:
-    command: 'plan'
-    workingDirectory: '$(workdir)'
-    environmentServiceName: 'PipelineConnection'
-    providerAzureRmSubscriptionId: $(subscription_id)
-    publishPlanResults: 'tfplan'
+        - task: TerraformCLI@0
+          displayName: Terraform Plan
+          inputs:
+            command: 'plan'
+            workingDirectory: '$(workdir)'
+            environmentServiceName: 'PipelineConnection'
+            providerAzureRmSubscriptionId: $(subscription_id)
+            publishPlanResults: 'tfplan'
 
-- task: TerraformCLI@0
-  displayName: Terraform Apply
-  inputs:
-    command: 'apply'
-    workingDirectory: '$(workdir)'
-    environmentServiceName: 'PipelineConnection'
-    providerAzureRmSubscriptionId: '$(subscription_id)'
+        - task: TerraformCLI@0
+          displayName: Terraform Apply
+          inputs:
+            command: 'apply'
+            workingDirectory: '$(workdir)'
+            environmentServiceName: 'PipelineConnection'
+            providerAzureRmSubscriptionId: '$(subscription_id)'
 
     
