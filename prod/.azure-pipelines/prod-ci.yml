@@ -3,8 +3,8 @@ pr: none
 resources:
   pipelines:
     - pipeline: Dev
-      project: BeStrong
-      source: dev-ci
+      project: 'BeStrong'
+      source: 'dev-ci'
       trigger:
         branches:
           include:
