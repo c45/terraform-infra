@@ -1,4 +1,10 @@
-trigger: none
+trigger: 
+  branches:
+    include:
+      - master
+  paths:
+    include:
+      - prod/*  
 pr: none
 
 
@@ -42,6 +48,10 @@ stages:
             providerAzureRmSubscriptionId: $(SUBSCRIPTION_ID)
             publishPlanResults: 'tfplan'
 
+        - task: ManualValidation@0
+          inputs:
+            notifyUsers: 'Apply Infrastructure'
+
         - task: TerraformCLI@0
           displayName: Terraform Apply
           inputs:
@@ -50,6 +60,9 @@ stages:
             environmentServiceName: 'PipelineConnection'
             providerAzureRmSubscriptionId: '$(SUBSCRIPTION_ID)'
 
+        - task: ManualIntervention@8
+          inputs:
+            instructions: 'Clean Up'
         - task: TerraformCLI@0
           inputs:
             command: 'destroy'
