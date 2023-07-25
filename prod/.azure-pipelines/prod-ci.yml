@@ -47,11 +47,20 @@ stages:
             environmentServiceName: 'PipelineConnection'
             providerAzureRmSubscriptionId: $(SUBSCRIPTION_ID)
             publishPlanResults: 'tfplan'
-
+  - stage: Manual_Approve
+    pool: server
+    jobs:
+      - job: Validation
+        steps:
         - task: ManualValidation@0
+        
           inputs:
             notifyUsers: 'Apply Infrastructure'
-
+  - stage: Apply
+    pool: ubuntu-latest
+    jobs:
+      - job: Apply
+        steps:
         - task: TerraformCLI@0
           displayName: Terraform Apply
           inputs:
@@ -59,10 +68,7 @@ stages:
             workingDirectory: '$(TF_ROOT)'
             environmentServiceName: 'PipelineConnection'
             providerAzureRmSubscriptionId: '$(SUBSCRIPTION_ID)'
-
-        - task: ManualIntervention@8
-          inputs:
-            instructions: 'Clean Up'
+            
         - task: TerraformCLI@0
           inputs:
             command: 'destroy'
