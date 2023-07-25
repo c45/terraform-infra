@@ -7,13 +7,13 @@ trigger:
       - dev/*  
 pr: none
 
-pool: 
-    vmImage: ubuntu-latest
-
 stages:
-  - stage: Dev
+  - stage: CI
+    pool: 
+      vmImage: ubuntu-latest
     jobs:
-      - job: CI
+      - job: Test
+        displayName: Run Tests
         steps:
         - task: TerraformInstaller@0
           displayName: Install Terraform
@@ -47,6 +47,21 @@ stages:
             providerAzureRmSubscriptionId: $(SUBSCRIPTION_ID)
             publishPlanResults: 'tfplan'
 
+  - stage: CD
+    pool: 
+      vmImage: ubuntu-latest
+    jobs:
+      - job: Deploy
+        steps:
+        - task: TerraformCLI@0
+          displayName: Terraform Init
+          inputs:
+            command: 'init'
+            workingDirectory: '$(TF_ROOT)'
+            backendType: 'azurerm'
+            backendServiceArm: 'PipelineConnection'
+            backendAzureRmSubscriptionId: $(SUBSCRIPTION_ID)
+
         - task: TerraformCLI@0
           displayName: Terraform Apply
           inputs:
@@ -54,7 +69,33 @@ stages:
             workingDirectory: '$(TF_ROOT)'
             environmentServiceName: 'PipelineConnection'
             providerAzureRmSubscriptionId: '$(SUBSCRIPTION_ID)'
+
+  - stage: Clean_Up
+    displayName: Clean Up
+    jobs:
+      - job: Approve
+        pool: server
+        steps:
+        - task: ManualValidation@0
+          inputs:
+            notifyUsers: 'Delete all cloud resources?'
+            onTimeout: 'resume'
+
+      - job: Destroy
+        pool:
+          vmImage: ubuntu-latest
+        steps:
         - task: TerraformCLI@0
+          displayName: Terraform Init
+          inputs:
+            command: 'init'
+            workingDirectory: '$(TF_ROOT)'
+            backendType: 'azurerm'
+            backendServiceArm: 'PipelineConnection'
+            backendAzureRmSubscriptionId: $(SUBSCRIPTION_ID) 
+
+        - task: TerraformCLI@0
+          displayName: Terraform Destroy
           inputs:
             command: 'destroy'
             workingDirectory: '$(TF_ROOT)'
