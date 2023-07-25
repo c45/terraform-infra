@@ -49,4 +49,10 @@ stages:
             environmentServiceName: 'PipelineConnection'
             providerAzureRmSubscriptionId: '$(SUBSCRIPTION_ID)'
 
+        - task: TerraformCLI@0
+          inputs:
+            command: 'destroy'
+            workingDirectory: '$(TF_ROOT)'
+            environmentServiceName: 'PipelineConnection'
+            providerAzureRmSubscriptionId: '$(SUBSCRIPTION_ID)'
     
