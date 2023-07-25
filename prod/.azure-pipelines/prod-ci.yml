@@ -12,9 +12,10 @@ pool:
     vmImage: ubuntu-latest
 
 stages:
-  - stage: Prod
+  - stage: CI
     jobs:
-      - job: CI
+      - job: Test
+        displayName: Run Tests
         steps:
         - task: TerraformInstaller@0
           displayName: Install Terraform
@@ -47,20 +48,20 @@ stages:
             environmentServiceName: 'PipelineConnection'
             providerAzureRmSubscriptionId: $(SUBSCRIPTION_ID)
             publishPlanResults: 'tfplan'
-  - stage: Manual_Approve
-    pool: server
+
+  - stage: CD
     jobs:
       - job: Validation
+        pool: server
         steps:
-        - task: ManualValidation@0
-        
-          inputs:
-            notifyUsers: 'Apply Infrastructure'
-  - stage: CD
-    pool: 
-      vmImage: ubuntu-latest
-    jobs:
-      - job: Apply
+          - task: ManualValidation@0
+            displayName: Manual Validation
+            inputs:
+              notifyUsers: 'Apply changes to the Production environment?'
+      - job: Deploy
+        pool: 
+          vmImage: ubuntu-latest
+        displayName: Deploying to Production
         steps:
         - task: TerraformCLI@0
           displayName: Terraform Init
@@ -78,8 +79,31 @@ stages:
             workingDirectory: '$(TF_ROOT)'
             environmentServiceName: 'PipelineConnection'
             providerAzureRmSubscriptionId: '$(SUBSCRIPTION_ID)'
-            
+
+  - stage: Clean_Up
+    displayName: Clean Up
+    jobs:
+      - job: Approve
+        pool: server
+        steps:
+        - task: ManualIntervention@8
+          inputs:
+            instructions: 'Delete all cloud resources?'
+
+      - job: Destroy
+        pool:
+          vmImage: ubuntu-latest
+        steps:
         - task: TerraformCLI@0
+          displayName: Terraform Init
+          inputs:
+            command: 'init'
+            workingDirectory: '$(TF_ROOT)'
+            backendType: 'azurerm'
+            backendServiceArm: 'PipelineConnection'
+            backendAzureRmSubscriptionId: $(SUBSCRIPTION_ID) 
+        - task: TerraformCLI@0
+          displayName: Terraform Destroy
           inputs:
             command: 'destroy'
             workingDirectory: '$(TF_ROOT)'
