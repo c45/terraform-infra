@@ -32,6 +32,6 @@ module "database" {
   location       = azurerm_resource_group.this.location
   server_name    = "${var.env_name}bestrongmssqlserver"
   db_name        = "${var.env_name}bestrongmssqldb"
-  max_size_gb    = 5
+  max_size_gb    = 10
   env_name       = var.env_name
 }
