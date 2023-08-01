@@ -1,5 +1,5 @@
 resource "azurerm_key_vault" "this" {
-  name                        = "${var.env_name}bestrongkeyvault"
+  name                        = "${terraform.workspace}bestrongkeyvault"
   resource_group_name         = azurerm_resource_group.this.name
   location                    = azurerm_resource_group.this.location
   enabled_for_disk_encryption = true
@@ -7,9 +7,7 @@ resource "azurerm_key_vault" "this" {
 
   sku_name = "standard"
 
-  tags = {
-    environment = var.env_name
-  }
+  tags = azurerm_resource_group.this.tags
 }
 
 resource "azurerm_key_vault_access_policy" "kv_access_policy" {

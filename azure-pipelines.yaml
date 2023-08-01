@@ -1,0 +1,182 @@
+trigger:
+  branches:
+    include:
+      - master
+  paths:
+    exclude:
+      - README.md
+pr:
+  branches:
+    include:
+      - "*"
+
+pool:
+  vmImage: ubuntu-latest
+
+stages:
+  - stage: BuildPR
+    displayName: Build PR Stage
+    condition: and(succeeded(), eq(variables['Build.Reason'], 'PullRequest'), ne(variables['System.PullRequest.PullRequestId'], 'Null'))
+    jobs:
+      - job: BuildPR
+        steps:
+          - task: TerraformInstaller@0
+            displayName: Install Terraform
+            inputs:
+              terraformVersion: "v1.5.2"
+
+          - checkout: self
+            displayName: Checkout Repository
+
+          - task: TerraformCLI@0
+            displayName: Terraform Init
+            inputs:
+              command: "init"
+              workingDirectory: "$(TF_ROOT)"
+              backendType: "azurerm"
+              backendServiceArm: "PipelineConnection"
+              backendAzureRmSubscriptionId: "$(SUBSCRIPTION_ID)"
+
+          - task: TerraformCLI@0
+            displayName: Terraform Validate
+            inputs:
+              command: "validate"
+              workingDirectory: "$(TF_ROOT)"
+
+          - task: TerraformCLI@0
+            displayName: Terraform Workspace Dev
+            inputs:
+              command: "workspace"
+              workspaceName: "dev"
+
+          - task: TerraformCLI@0
+            displayName: Terraform Plan
+            inputs:
+              command: "plan"
+              workingDirectory: "$(TF_ROOT)"
+              environmentServiceName: "PipelineConnection"
+              providerAzureRmSubscriptionId: $(SUBSCRIPTION_ID)
+              publishPlanResults: "tfplan"
+
+  - stage: DeployDev
+    displayName: Deploy to Dev Stage
+    condition: and(succeeded(), eq(variables['Build.SourceBranchName'], 'master'))
+    jobs:
+      - job: Deploy
+        steps:
+          - task: TerraformInstaller@0
+            displayName: Install Terraform
+            inputs:
+              terraformVersion: "v1.5.2"
+
+          - checkout: self
+            displayName: Checkout Repository
+
+          - task: TerraformCLI@0
+            displayName: Terraform Init
+            inputs:
+              command: "init"
+              workingDirectory: "$(TF_ROOT)"
+              backendType: "azurerm"
+              backendServiceArm: "PipelineConnection"
+              backendAzureRmSubscriptionId: $(SUBSCRIPTION_ID)
+
+          - task: TerraformCLI@0
+            displayName: Terraform Workspace Dev
+            inputs:
+              command: "workspace"
+              workspaceName: "dev"
+
+          - task: TerraformCLI@0
+            displayName: Terraform Apply
+            inputs:
+              command: "apply"
+              workingDirectory: "$(TF_ROOT)"
+              environmentServiceName: "PipelineConnection"
+              providerAzureRmSubscriptionId: "$(SUBSCRIPTION_ID)"
+
+          - task: TerraformCLI@0
+            displayName: Terraform Destroy
+            inputs:
+              command: "destroy"
+              workingDirectory: "$(TF_ROOT)"
+              environmentServiceName: "PipelineConnection"
+              providerAzureRmSubscriptionId: "$(SUBSCRIPTION_ID)"
+
+  - stage: DeployProd
+    displayName: Deploy to Prod Stage
+    condition: and(succeeded(), eq(variables['Build.SourceBranchName'], 'master'))
+    jobs:
+      - job: Approve
+        pool: server
+        steps:
+          - task: ManualValidation@0
+            displayName: Manual Validation
+            inputs:
+              notifyUsers: "Apply changes to the Production environment?"
+
+      - job: Deploy
+        pool:
+          vmImage: ubuntu-latest
+        displayName: Deploy to Production
+        steps:
+          - task: TerraformCLI@0
+            displayName: Terraform Init
+            inputs:
+              command: "init"
+              workingDirectory: "$(TF_ROOT)"
+              backendType: "azurerm"
+              backendServiceArm: "PipelineConnection"
+              backendAzureRmSubscriptionId: $(SUBSCRIPTION_ID)
+
+          - task: TerraformCLI@0
+            displayName: Terraform Workspace Prod
+            inputs:
+              command: "workspace"
+              workspaceName: "prod"
+
+          - task: TerraformCLI@0
+            displayName: Terraform Apply
+            inputs:
+              command: "apply"
+              workingDirectory: "$(TF_ROOT)"
+              environmentServiceName: "PipelineConnection"
+              providerAzureRmSubscriptionId: "$(SUBSCRIPTION_ID)"
+
+  - stage: Clean_Up
+    displayName: Clean Up
+    jobs:
+      - job: Approve
+        pool: server
+        steps:
+          - task: ManualValidation@0
+            inputs:
+              notifyUsers: "Delete all cloud resources?"
+              onTimeout: "resume"
+
+      - job: Destroy
+        pool:
+          vmImage: ubuntu-latest
+        steps:
+          - task: TerraformCLI@0
+            displayName: Terraform Init
+            inputs:
+              command: "init"
+              workingDirectory: "$(TF_ROOT)"
+              backendType: "azurerm"
+              backendServiceArm: "PipelineConnection"
+              backendAzureRmSubscriptionId: $(SUBSCRIPTION_ID)
+
+          - task: TerraformCLI@0
+            displayName: Terraform Workspace Prod
+            inputs:
+              command: "workspace"
+              workspaceName: "prod"
+
+          - task: TerraformCLI@0
+            displayName: Terraform Destroy
+            inputs:
+              command: "destroy"
+              workingDirectory: "$(TF_ROOT)"
+              environmentServiceName: "PipelineConnection"
+              providerAzureRmSubscriptionId: "$(SUBSCRIPTION_ID)"

@@ -1,12 +1,10 @@
 resource "azurerm_container_registry" "this" {
-  name                = "${var.env_name}bestrongregistry"
+  name                = "${terraform.workspace}bestrongregistry"
   resource_group_name = azurerm_resource_group.this.name
   location            = azurerm_resource_group.this.location
   sku                 = "Basic"
 
-  tags = {
-    environment = var.env_name
-  }
+  tags = azurerm_resource_group.this.tags
 }
 
 resource "azurerm_role_assignment" "acr_role" {
