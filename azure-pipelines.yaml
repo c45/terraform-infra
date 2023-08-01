@@ -28,6 +28,8 @@ stages:
           - checkout: self
             displayName: Checkout Repository
 
+          - script: pwd && ls
+            
           - task: TerraformCLI@0
             displayName: Terraform Init
             inputs:
