@@ -29,6 +29,8 @@ stages:
             displayName: Checkout Repository
 
           - script: pwd && ls
+            displayName: test
+
             
           - task: TerraformCLI@0
             displayName: Terraform Init
