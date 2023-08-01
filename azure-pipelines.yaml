@@ -59,7 +59,7 @@ stages:
 
   - stage: DeployDev
     displayName: Deploy to Dev Stage
-    condition: and(succeeded(), eq(variables['Build.SourceBranchName'], 'master'))
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
     jobs:
       - job: Deploy
         steps:
