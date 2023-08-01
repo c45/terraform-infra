@@ -86,21 +86,21 @@ stages:
               command: "workspace"
               workspaceName: "dev"
 
-          - task: TerraformCLI@0
-            displayName: Terraform Apply
-            inputs:
-              command: "apply"
-              workingDirectory: "$(TF_ROOT)"
-              environmentServiceName: "PipelineConnection"
-              providerAzureRmSubscriptionId: "$(SUBSCRIPTION_ID)"
+          # - task: TerraformCLI@0
+          #   displayName: Terraform Apply
+          #   inputs:
+          #     command: "apply"
+          #     workingDirectory: "$(TF_ROOT)"
+          #     environmentServiceName: "PipelineConnection"
+          #     providerAzureRmSubscriptionId: "$(SUBSCRIPTION_ID)"
 
-          - task: TerraformCLI@0
-            displayName: Terraform Destroy
-            inputs:
-              command: "destroy"
-              workingDirectory: "$(TF_ROOT)"
-              environmentServiceName: "PipelineConnection"
-              providerAzureRmSubscriptionId: "$(SUBSCRIPTION_ID)"
+          # - task: TerraformCLI@0
+          #   displayName: Terraform Destroy
+          #   inputs:
+          #     command: "destroy"
+          #     workingDirectory: "$(TF_ROOT)"
+          #     environmentServiceName: "PipelineConnection"
+          #     providerAzureRmSubscriptionId: "$(SUBSCRIPTION_ID)"
 
   - stage: DeployProd
     displayName: Deploy to Prod Stage
