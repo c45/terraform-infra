@@ -104,7 +104,7 @@ stages:
 
   - stage: DeployProd
     displayName: Deploy to Prod Stage
-    condition: and(succeeded(), eq(variables['Build.SourceBranchName'], 'master'))
+    dependsOn: DeployDev
     jobs:
       - job: Approve
         pool: server
@@ -143,7 +143,7 @@ stages:
               providerAzureRmSubscriptionId: "$(SUBSCRIPTION_ID)"
 
   - stage: Clean_Up
-    displayName: Clean Up
+    displayName: Clean Up Stage
     jobs:
       - job: Approve
         pool: server
