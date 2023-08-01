@@ -145,6 +145,8 @@ stages:
 
   - stage: Clean_Up
     displayName: Clean Up Stage
+    condition: eq(variables['Build.SourceBranch'], 'refs/heads/master')
+    dependsOn: DeployProd
     jobs:
       - job: Approve
         pool: server
